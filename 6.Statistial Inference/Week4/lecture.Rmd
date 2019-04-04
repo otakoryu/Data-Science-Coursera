@@ -1,0 +1,134 @@
+---
+title: "Statitstical Inference week 4"
+output: html_document
+---
+
+##Power
+###11-01; Power
+Power is the probability of rejecting the null hypothesis when it is false
+
+A type ll eeor(a bad thing, as its name would suggest) is failing to reject the null hypothesis whne it's false; the probability of type ll error is usually called beta
+
+Note power= 1-beta
+
+
+###Calculating Power
+z<-qnorm(1-alpha)
+pnorm(mu0+z*sigma/sqrt(n),mean=mua,sd=sigma/sqrt(n),lower.tail=FALSE)
+
+```{r}
+mu0<-30
+mua<-32
+sigma<-4
+n<-16
+z = qnorm(1 - alpha)
+pnorm(mu0 + z * sigma/sqrt(n), mean = mu0, sd = sigma/sqrt(n), lower.tail = FALSE)
+
+pnorm(mu0 + z * sigma/sqrt(n), mean = mua, sd = sigma/sqrt(n), lower.tail = FALSE)
+##64% probability of detecting a mean as large as 32 or larger if we conduct this experiment
+```
+####Graphical depiction of Power
+```{r}
+library(manipulate)
+mu0 = 30
+myplot <- function(sigma, mua, n, alpha) {    
+    g = ggplot(data.frame(mu = c(27, 36)), aes(x = mu))    
+    g = g + stat_function(fun = dnorm, geom = "line", args = list(mean = mu0,         
+        sd = sigma/sqrt(n)), size = 2, col = "red")    
+    g = g + stat_function(fun = dnorm, geom = "line", args = list(mean = mua,         
+        sd = sigma/sqrt(n)), size = 2, col = "blue")    
+    xitc = mu0 + qnorm(1 - alpha) * sigma/sqrt(n)    
+    g = g + geom_vline(xintercept = xitc, size = 3)    
+    g
+}
+manipulate(myplot(sigma, mua, n, alpha), sigma = slider(1, 10, step = 1, initial = 4),     
+           mua = slider(30, 35, step = 1, initial = 32), n = slider(1, 50, step = 1,         
+                initial = 16), alpha = slider(0.01, 0.1, step = 0.01, initial = 0.05))
+```
+
+###11-04;T-test Power
+
+####Grabbing Power
+```{r}
+power.t.test(n=16, delta = 2/4, sd = 1, type = "one.sample", alt = "one.sided")$power
+
+power.t.test(n=16, delta = 2, sd = 4, type = "one.sample", alt = "one.sided")$power
+##one sided; mu>mu0
+
+power.t.test(n=16, delta = 100, sd = 200, type = "one.sample", alt = "one.sided")$power
+```
+The reason why get the same power is that effect parameter;delta and sd across three different calcualtions is the same in terms of the degree of influence on power calcualtion
+
+
+####Grabbing smaple size
+```{r}
+power.t.test(power = 0.8, delta = 2/4, sd = 1, type = "one.sample", alt = "one.sided")$n
+
+power.t.test(power = 0.8, delta = 2, sd = 4, type = "one.sample", alt = "one.sided")$n
+
+power.t.test(power = 0.8, delta = 100, sd = 200, type = "one.sample", alt = "one.sided")$n
+```
+
+
+###13-02; Bootstrapping Example 
+
+```{r}
+library(UsingR)
+data(father.son)
+x<-father.son$sheight
+n<-length(x)
+B<-10000
+resamples<-matrix(sample(x,n*B,replace = TRUE),B,n)  ##replce once you draw sample from back,put it back to the back;;called emperical distribution
+resampleMedians<-apply(resamples,1,median)
+
+resampledMedians<-density(resampleMedians)
+plot(resampledMedians)
+```
+
+
+###13-03; Notes on Bootstrap
+#####Example
+```{r}
+B<-10000  ##the number of resampling
+resamples<-matrix(sample(x,n*B,replace = TRUE),B,n)  ###B rows and n columns
+medians<-apply(resamples,1,median)
+sd(medians)
+
+quantile(medians,c(.025,.0975)) ##alghouth, it's poor quntile, to fix it, we can use some arrangement 
+```
+#####Histgram of Bootsrap resamples
+```{r}
+library(ggplot2)
+ggplot(data.frame(medians=medians),aes(x=medians))+
+    geom_histogram(color="black",fill="lightblue",binwidth = 0.05)
+```
+This pot is an estimate of sampling distribution of the median.
+If we had the true population distribution and we were to sample over and over again. This would be very good estimate up to Monte Carlo error of the sample distribution of the median
+
+#####Final notes of bootstrap
+- The bootstrap is non-parametric; the above confidence interval is somewhat poorly performed
+- Better percentile bootstrap confidence interval correct for bias
+- They are lots of variations on bootstrap procedures
+
+
+
+###13-04; Permutation Tests
+-Useful for group comparison in independt groups
+
+```{r}
+data(InsectSprays)
+boxplot(count ~ spray, data = InsectSprays)
+```
+
+####Permutation test B v C
+```{r}
+subdata <- InsectSprays[InsectSprays$spray %in% c("B", "C"), ]
+y <- subdata$count
+group <- as.character(subdata$spray)
+testStat <- function(w, g) mean(w[g == "B"]) - mean(w[g == "C"])
+observedStat <- testStat(y, group)
+permutations <- sapply(1:10000, function(i) testStat(y, sample(group)))
+observedStat
+
+mean(permutations > observedStat)
+```

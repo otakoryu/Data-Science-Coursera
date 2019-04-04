@@ -1,0 +1,123 @@
+---
+title: "Statistical Inference Week 4 Quiz"
+output: html_document
+---
+
+####Q1
+A pharmaceutical company is interested in testing a potential blood pressure lowering medication. Their first examination considers only subjects that received the medication at baseline then two weeks later. The data are as follows (SBP in mmHg)
+```{r}
+subject<-c(1:5)
+baseline<-c(140,138,150,148,135)
+week2<-c(132,135,151,146,130)
+data<-as.data.frame(cbind(subject,baseline,week2))
+data
+
+
+x1<-data$baseline
+y1<-data$week2
+test1<-t.test(x1, y1, paired = TRUE, alt="two.sided")
+pvalue<-test1$p.value
+round(pvalue,3)
+```
+
+
+####Q2
+A sample of 9 men yielded a sample average brain volume of 1,100cc and a standard deviation of 30cc. What is the complete set of values of ??0 that a test of H0:mu=mu0 would fail to reject the null hypothesis in a two sided 5% Students t-test?
+
+Makes confidence interval
+```{r}
+n2<-9
+mn2<-1100
+sd2<-30
+
+conf2<-mn2+c(-1,1)*qt(.975,n2-1)*sd2/sqrt(n2)  ##.975 is 95% with 2.5% on low and upper tail
+conf2
+```
+
+
+####Q3
+Researchers conducted a blind taste test of Coke versus Pepsi. Each of four people was asked which of two blinded drinks given in random order that they preferred. The data was such that 3 of the 4 people chose Coke. Assuming that this sample is representative, report a P-value for a test of the hypothesis that Coke is preferred to Pepsi using a one sided exact test.
+```{r}
+n3<-4
+x3<-3
+
+test3<-binom.test(x3,n3,alt="greater")
+test3$p.value
+```
+
+
+####Q4
+Infection rates at a hospital above 1 infection per 100 person days at risk are believed to be too high and are used as a benchmark. A hospital that had previously been above the benchmark recently had 10 infections over the last 1,787 person days at risk. About what is the one sided P-value for the relevant test of whether the hospital is *below* the standard?
+```{r}
+rate<-1/100
+error<-10
+days<-1787
+test4<-poisson.test(error,days,rate,alt="less")
+test4$p.value
+```
+
+
+####Q5
+Suppose that 18 obese subjects were randomized, 9 each, to a new diet pill and a placebo. Subjects' body mass indices (BMIs) were measured at a baseline and again after having received the treatment or placebo for four weeks. The average difference from follow-up to the baseline (followup - baseline) was ???3 kg/m2 for the treated group and 1 kg/m2 for the placebo group. The corresponding standard deviations of the differences was 1.5 kg/m2 for the treatment group and 1.8 kg/m2 for the placebo group. Does the change in BMI appear to differ between the treated and placebo groups? Assuming normality of the underlying data and a common population variance, give a pvalue for a two sided t test.
+```{r}
+n.x<-9 #treated
+n.y<-9 #placebo 
+mn.x<--3 #avg.diff for treated
+mn.y<-1 #avg.diff for placebo
+sd.x<-1.5 #sd for treated
+sd.y<-1.8 #sd for placebo
+
+sp5<-(((n.y-1)*sd.y^2+(n.x-1)*sd.x^2)/(n.x+n.y-2))
+pval<-pt((mn.x-mn.y)/(sp5*(1/n.y+1/n.x)^.5),df=n.y+n.x-2)
+pval
+```
+
+
+####Q6
+Brain volumes for 9 men yielded a 90% confidence interval of 1,077 cc to 1,123 cc. Would you reject in a two sided 5% hypothesis test of \(H_0:??=1,078\)?
+
+- It's impossible to tell.
+
+- Where does Brian come up with these questions?
+
+- Yes you would reject.
+
+- No you wouldn't reject.  Answer
+
+
+####Q7    
+Researchers would like to conduct a study of 100 healthy adults to detect a four year mean brain volume loss of .01 mm3. Assume that the standard deviation of four year volume loss in this population is .04 mm3. About what would be the power of the study for a 5% one sided test versus a null hypothesis of no volume loss?
+```{r}
+n7<-100
+mn7<-0.01
+sd7<-0.04
+p<-0.05
+
+power<-power.t.test(n7,delta=mn7,sd=sd7,sig.level=p,type="one.sample",alt="one.sided")$power
+power
+```
+
+
+####Q8
+Researchers would like to conduct a study of n healthy adults to detect a four year mean brain volume loss of .01 mm3. Assume that the standard deviation of four year volume loss in this population is .04 mm3. About what would be the value of n needded for 90% power of type one error rate of 5% one sided test versus a null hypothesis of no volume loss?
+```{r}
+mn8 <- 0.01# m^3 brain volume loss mean
+sd8 <- 0.04# m^3 brain volume loss std. dev.
+p8 <- 0.05 # sign level
+pow8 <- 0.9 #power
+
+n <- power.t.test(power=pow8, delta=mn8, sd=sd8 , sig.level=p, type="one.sample", alt="one.sided")$n
+ceiling(n/10)*10
+```
+
+
+####Q9
+As you increase the type one error rate, alpha \alpha ??, what happens to power?
+
+- It's impossible to tell given the information in the problem.
+
+- You will get smaller power.
+
+- You will get larger power.  Ans
+
+- No, for real, where does Brian come up with these problems?

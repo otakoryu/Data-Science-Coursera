@@ -1,0 +1,71 @@
+---
+title: "Statistical Inference Q1"
+output: html_document
+---
+
+###Q1
+Consider influenza epidemics for two parent heterosexual families. Suppose that the probability is 17% that at least one of the parents has contracted the disease. The probability that the father has contracted influenza is 12% while the probability that both the mother and father have contracted the disease is 6%. What is the probability that the mother has contracted influenza?
+(Hints look at lecture 2 around 5:30 and chapter 4 problem 4).
+```{r}
+#A=mom,B=dad
+P.AuB<-0.17
+P.B<-0.12
+P.AnB<-0.06
+#P(A)=P(AuB)-P(B)+P(AnB)
+P.A<-P.AuB-P.B+P.AnB
+P.A
+```
+###Q2
+A random variable, XX is uniform, a box from 0 to 1 of height 1. (So that its density is 
+f(x)=1 for 0<=x<=1) What is its 75th percentile?
+
+(Hints, look at lecture 2 around 21:30 and Chapter 5 Problem 5. Also, look up the help function for the qunif command in R.)
+
+Point;this is just 75percetnile of uniform density, then just use that function to return that needed value
+```{r}
+qunif(p=0.75, min=0, max=1)
+```
+
+###Q3
+You are playing a game with a friend where you flip a coin and if it comes up heads you give her mean(X) dollars and if it comes up tails she gives you mean(Y) dollars. The probability that the coin is heads is pp (some number between 00 and 11.) What has to be true about mean(X) and mean(Y) to make so that both of your expected total earnings is 00. The game would then be called "fair".
+
+(Hints, look at Lecture 4 from 0 to 6:50 and Chapter 5 Problem 6. Also, for further reading on fair games and gambling, start with the Dutch Book problem ).
+
+Point;Head=get money,Tail=Give money(Substruct)
+
+E=0=x*p-y(1-p)
+xp=y(1-p)
+y/x=p/(1-p)
+
+###Q4
+A density that looks like a normal density (but may or may not be exactly normal) is exactly symmetric about zero. (Symmetric means if you flip it around zero it looks the same.) What is its median?
+
+Median must be Zero
+
+###Q5
+Consider the following PMF shown below in R
+```{r}
+x <- 1:4
+p <- x/sum(x)
+temp <- rbind(x, p)
+rownames(temp) <- c("X", "Prob")
+temp
+```
+What is the mean?
+```{r}
+Expected.Value<-sum(temp["X",]*temp["Prob",])
+Expected.Value
+```
+###Q6
+A web site (www.medicine.ox.ac.uk/bandolier/band64/b64-7.html) for home pregnancy tests cites the following: "When the subjects using the test were women who collected and tested their own samples, the overall sensitivity was 75%. Specificity was also low, in the range 52% to 75%." Assume the lower value for the specificity. Suppose a subject has a positive test and that 30% of women taking pregnancy tests are actually pregnant. What number is closest to the probability of pregnancy given the positive test?
+
+(Hints, watch Lecture 3 at around 7 minutes for a similar example. Also, there's a lot of Bayes' rule problems and descriptions out there, for example here's one for HIV testing. Note, discussions of Bayes' rule can get pretty heady. So if it's new to you, stick to basic treatments of the problem. Also see Chapter 3 Question 5.)
+
+Bayes' rule
+P(+|preg)=0.75
+P(+|notpreg)=1-0.52=0.48
+P(preg)=0.3
+P(notpreg)=1-0.3=0.7
+
+P(+)=.75*.3+.48*.7=.561
+P(Preg|+)=.75*.3/.561=.40

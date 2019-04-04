@@ -1,0 +1,57 @@
+---
+title: "Statistical Inferences Week1 lecture"
+output: html_notebook
+---
+
+##Probability
+Question;is this mathematically valid density??
+```{r}
+x <- c(-0.5, 0, 1, 1, 1.5)
+y <- c(0, 0, 2, 0, 0)
+plot(x, y, lwd = 3, frame = FALSE, type = "l")
+
+1*2*1/2
+```
+the area is "1", so this right triangle is valid probality density function(always between 0 and 1)
+
+Q; What is the probability that 75% or fewer of calls get addressed?
+```{r}
+1.5 * 0.75/2
+##56% 
+
+pbeta(0.75, 2, 1) ##Beta density(Probability)
+```
+
+```{r}
+pbeta(c(0.4, 0.5, 0.6), 2, 1)
+```
+
+```{r}
+qbeta(0.5, 2, 1)
+```
+
+##Conditional Probability
+
+
+
+##Expected Values
+It is the center of distribution. as it is an estimator of population
+
+
+
+```{r}
+library(datasets)
+library(ggplot2)
+library(manipulate)
+myHist <- function(mu){
+    g <- ggplot(galton, aes(x = child))
+    g <- g + geom_histogram(fill = "salmon",       
+        binwidth=1, aes(y = ..density..), colour = "black")
+    g <- g + geom_density(size = 2)
+    g <- g + geom_vline(xintercept = mu, size = 2)
+    mse <- round(mean((galton$child - mu)^2), 3)
+    g <- g + labs(title = paste('mu = ', mu, ' MSE = ', mse))
+    g
+}
+manipulate(myHist(mu), mu = slider(62, 74, step = 0.5))
+```

@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<title></title>
+
+<script type="text/javascript">
+window.onload = function() {
+  var imgs = document.getElementsByTagName('img'), i, img;
+  for (i = 0; i < imgs.length; i++) {
+    img = imgs[i];
+    // center an image if it is the only element of its parent
+    if (img.parentElement.childElementCount === 1)
+      img.parentElement.style.textAlign = 'center';
+  }
+};
+</script>
+
+
+
+
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 13px;
+}
+
+body {
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 20px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 {
+   font-size:2.2em;
+}
+
+h2 {
+   font-size:1.8em;
+}
+
+h3 {
+   font-size:1.4em;
+}
+
+h4 {
+   font-size:1.0em;
+}
+
+h5 {
+   font-size:0.9em;
+}
+
+h6 {
+   font-size:0.8em;
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre, img {
+  max-width: 100%;
+}
+pre {
+  overflow-x: auto;
+}
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code {
+  font-size: 92%;
+  border: 1px solid #ccc;
+}
+
+code[class] {
+  background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * {
+      background: transparent !important;
+      color: black !important;
+      filter:none !important;
+      -ms-filter: none !important;
+   }
+
+   body {
+      font-size:12pt;
+      max-width:100%;
+   }
+
+   a, a:visited {
+      text-decoration: underline;
+   }
+
+   hr {
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote {
+      padding-right: 1em;
+      page-break-inside: avoid;
+   }
+
+   tr, img {
+      page-break-inside: avoid;
+   }
+
+   img {
+      max-width: 100% !important;
+   }
+
+   @page :left {
+      margin: 15mm 20mm 15mm 10mm;
+   }
+
+   @page :right {
+      margin: 15mm 10mm 15mm 20mm;
+   }
+
+   p, h2, h3 {
+      orphans: 3; widows: 3;
+   }
+
+   h2, h3 {
+      page-break-after: avoid;
+   }
+}
+</style>
+
+
+
+</head>
+
+<body>
+<p>####Introduction
+Now in the second portion of the project, we&#39;re going to analyze the ToothGrowth data in the R datasets package.</p>
+
+<p>See if there is diiferent effect on toothgrowth over several different supplementation </p>
+
+<p>#####1.Load the ToothGrowth data and perform some basic exploratory data analyses
+Load and pre-precoess data</p>
+
+<pre><code class="r">library(datasets)
+data(&quot;ToothGrowth&quot;)
+
+dim(ToothGrowth)
+</code></pre>
+
+<pre><code>## [1] 60  3
+</code></pre>
+
+<pre><code class="r">str(ToothGrowth)
+</code></pre>
+
+<pre><code>## &#39;data.frame&#39;:    60 obs. of  3 variables:
+##  $ len : num  4.2 11.5 7.3 5.8 6.4 10 11.2 11.2 5.2 7 ...
+##  $ supp: Factor w/ 2 levels &quot;OJ&quot;,&quot;VC&quot;: 2 2 2 2 2 2 2 2 2 2 ...
+##  $ dose: num  0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 ...
+</code></pre>
+
+<pre><code class="r">head(ToothGrowth)
+</code></pre>
+
+<pre><code>##    len supp dose
+## 1  4.2   VC  0.5
+## 2 11.5   VC  0.5
+## 3  7.3   VC  0.5
+## 4  5.8   VC  0.5
+## 5  6.4   VC  0.5
+## 6 10.0   VC  0.5
+</code></pre>
+
+<pre><code class="r">ToothGrowth$dose&lt;-as.factor(ToothGrowth$dose)
+str(ToothGrowth)
+</code></pre>
+
+<pre><code>## &#39;data.frame&#39;:    60 obs. of  3 variables:
+##  $ len : num  4.2 11.5 7.3 5.8 6.4 10 11.2 11.2 5.2 7 ...
+##  $ supp: Factor w/ 2 levels &quot;OJ&quot;,&quot;VC&quot;: 2 2 2 2 2 2 2 2 2 2 ...
+##  $ dose: Factor w/ 3 levels &quot;0.5&quot;,&quot;1&quot;,&quot;2&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+</code></pre>
+
+<pre><code class="r">summary(ToothGrowth)
+</code></pre>
+
+<pre><code>##       len        supp     dose   
+##  Min.   : 4.20   OJ:30   0.5:20  
+##  1st Qu.:13.07   VC:30   1  :20  
+##  Median :19.25           2  :20  
+##  Mean   :18.81                   
+##  3rd Qu.:25.27                   
+##  Max.   :33.90
+</code></pre>
+
+<pre><code class="r">library(ggplot2)
+
+ggplot(ToothGrowth,aes(x=dose,y=len,fill=dose))+
+    geom_boxplot(outlier.color = &quot;red&quot;,outlier.shape = 8,outlier.size = 4)+
+    stat_summary(fun.y=mean, geom=&quot;point&quot;, shape=23, size=4)+
+    facet_wrap(~supp)+
+    theme(legend.position = &quot;bottom&quot;,
+          axis.title.y = element_text(vjust = 1, angle = 0)
+          ,axis.title.x = element_text(hjust = 0))+
+    xlab(&quot;Dosage&quot;)+
+    ylab(&quot;Lenght of Teeth&quot;)+
+    labs(title=expression(&quot;Effect of Dosage and Supplement Type on Tooth Growth&quot;))
+</code></pre>
+
+<p><img src="figure/unnamed-chunk-1-1.png" alt="plot of chunk unnamed-chunk-1"></p>
+
+<p>#####2. Provide a basic summary of the data.</p>
+
+<pre><code class="r">summary&lt;-summary(ToothGrowth)
+summary
+</code></pre>
+
+<pre><code>##       len        supp     dose   
+##  Min.   : 4.20   OJ:30   0.5:20  
+##  1st Qu.:13.07   VC:30   1  :20  
+##  Median :19.25           2  :20  
+##  Mean   :18.81                   
+##  3rd Qu.:25.27                   
+##  Max.   :33.90
+</code></pre>
+
+<pre><code class="r">sd&lt;-sd(ToothGrowth$len)
+sd
+</code></pre>
+
+<pre><code>## [1] 7.649315
+</code></pre>
+
+<p>#####3. Use confidence intervals and/or hypothesis tests to compare tooth growth by supp and dose. (Only use the techniques from class, even if there&#39;s other approaches worth considering)</p>
+
+<p>Supplement</p>
+
+<pre><code class="r">test1&lt;-t.test(len~supp,paired=F,var.equal=TRUE,data = ToothGrowth)
+test2&lt;-t.test(len~supp,paired=F,var.equal=FALSE,data=ToothGrowth)
+supp.test&lt;-data.frame(&quot;p.value&quot;=c(test1$p.value,test2$p.value),
+                      &quot;lower.bound&quot;=c(test1$conf[1],test2$conf[1]),
+                      &quot;upper.bound&quot;=c(test1$conf[2],test2$conf[2]),
+                      row.names=c(&quot;Var.Equal&quot;,&quot;Var.Unequal&quot;))
+
+supp.test
+</code></pre>
+
+<pre><code>##                p.value lower.bound upper.bound
+## Var.Equal   0.06039337  -0.1670064    7.567006
+## Var.Unequal 0.06063451  -0.1710156    7.571016
+</code></pre>
+
+<p>Dosage</p>
+
+<pre><code class="r">d0.5&lt;-subset(ToothGrowth,ToothGrowth$dose %in% c(0.5))
+d1.0&lt;-subset(ToothGrowth,ToothGrowth$dose %in% c(1.0))
+d2.0&lt;-subset(ToothGrowth,ToothGrowth$dose %in% c(2.0))
+
+test.5&lt;-t.test(len~supp,paired=FALSE,var.equal=FALSE,data=d0.5)
+test.out.5&lt;-data.frame(&quot;p.value&quot;=c(test.5$p.value),
+                       &quot;Estimated mean&quot;=c(test.5$estimate),
+                       &quot;lower.bound&quot;=c(test.5$conf[1]),
+                       &quot;upper.bound&quot;=c(test.5$conf[2]))
+test.out.5
+</code></pre>
+
+<pre><code>##                      p.value Estimated.mean lower.bound upper.bound
+## mean in group OJ 0.006358607          13.23    1.719057    8.780943
+## mean in group VC 0.006358607           7.98    1.719057    8.780943
+</code></pre>
+
+<pre><code class="r">test.1&lt;-t.test(len~supp,paired=FALSE,var.equal=FALSE,data=d1.0)
+test.out.1&lt;-data.frame(&quot;p.value&quot;=c(test.1$p.value),
+                       &quot;Estimated mean&quot;=c(test.1$estimate),
+                       &quot;lower.bound&quot;=c(test.1$conf[1]),
+                       &quot;upper.bound&quot;=c(test.1$conf[2]))
+test.out.1
+</code></pre>
+
+<pre><code>##                      p.value Estimated.mean lower.bound upper.bound
+## mean in group OJ 0.001038376          22.70    2.802148    9.057852
+## mean in group VC 0.001038376          16.77    2.802148    9.057852
+</code></pre>
+
+<pre><code class="r">test.2&lt;-t.test(len~supp,paired=FALSE,var.equal=FALSE,data=d2.0)
+test.out.2&lt;-data.frame(&quot;p.value&quot;=c(test.2$p.value),
+                       &quot;Estimated mean&quot;=c(test.2$estimate),
+                       &quot;lower.bound&quot;=c(test.2$conf[1]),
+                       &quot;upper.bound&quot;=c(test.2$conf[2]))
+test.out.2
+</code></pre>
+
+<pre><code>##                    p.value Estimated.mean lower.bound upper.bound
+## mean in group OJ 0.9638516          26.06    -3.79807     3.63807
+## mean in group VC 0.9638516          26.14    -3.79807     3.63807
+</code></pre>
+
+<p>#####4. State your conclusions and the assumptions needed for your conclusions.</p>
+
+<ul>
+<li><p>T test result based on supplement type shows that indeed supplement type does not affect toothgrowth, since 95% confidence interval does include zero, therefore in Hypothesis test, we cannot reject H0 which is there is not true difference in means of OJ and VC.</p></li>
+<li><p>T test based on dosage, when the amount of dosage is 0.5 and 1.0 milligram, OJ and VC has different effect on toothgrowth. Technically, when it is the case, OJ has more faster effect on toothgrowth.</p></li>
+<li><p>When the dosage is 2.0milligram, there might not be difference in toothgrowth. Even if it&#39;s there, both has kind of same effect on toothgrowth.</p></li>
+<li><p>Dosage has greater effect than supplement on toothgrowth</p></li>
+</ul>
+
+</body>
+
+</html>
