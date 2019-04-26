@@ -1,0 +1,174 @@
+---
+title: "ML Course project"
+output: html_document
+---
+```{r setup, cache = F, echo = F, message = F, warning = F, tidy = F}
+# make this an external chunk that can be included in any file
+require(knitr)
+options(width = 100)
+opts_chunk$set(message = F, error = F, warning = F, comment = NA, fig.align = 'center', dpi = 100, tidy = F, cache=TRUE, cache.path = '.cache/', fig.path = 'fig/')
+options(xtable.type = 'html')
+knit_hooks$set(inline = function(x) {
+  if(is.numeric(x)) {
+    round(x, getOption('digits'))
+  } else {
+    paste(as.character(x), collapse = ', ')
+  }
+})
+knit_hooks$set(plot = knitr:::hook_plot_html)
+```
+
+---
+
+###Introduction
+Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement - a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it. In this project, your goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways. More information is available from the website here: [http://web.archive.org/web/20161224072740/http:/groupware.les.inf.puc-rio.br/har] (see the section on the Weight Lifting Exercise Dataset).
+
+####Data Source
+The training data for this project are available here:
+
+https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv
+
+The test data are available here:
+
+https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv
+
+The data for this project come from this source: http://web.archive.org/web/20161224072740/http:/groupware.les.inf.puc-rio.br/har. If you use the document you create for this class for any purpose please cite them as they have been very generous in allowing their data to be used for this kind of assignment.
+
+---
+####Load data & Needed Packages
+
+```{r}
+
+train <- read.csv("pml-training.csv", header = TRUE)
+test <- read.csv("pml-testing.csv", header = TRUE)
+
+
+require(caret); require(ggplot2); require(randomForest); require(rattle)
+
+dim(train); dim(test)
+
+
+```
+
+---
+
+### 1.Pre-precoessing data
+
+&nbsp;
+
+Remove all the columns that have  all NAs and exclude all the irrlevant columns
+
+```{r}
+
+subs = names(test[,colSums(is.na(test)) == 0])[8:59]
+
+train = train[,c(subs,"classe")]
+test = test[,c(subs, "problem_id")]
+valid = test
+
+dim(train); dim(test)
+
+```
+
+---
+
+###2. Splitting Data
+
+Splitting data into 80% for training set and 20% for testing set
+
+```{r}
+set.seed(1)
+
+inTrain = createDataPartition(train$classe, p=0.8, list=FALSE)
+training = train[inTrain,]
+testing = train[-inTrain,]
+
+dim(training)
+```
+
+---
+
+###3.Dropping some undesirable variables
+
+```{r}
+require(caret)
+
+Pred.info = nearZeroVar(training, saveMetrics = TRUE)
+
+training = training[,!Pred.info$nzv]
+
+dim(training)
+```
+
+###4. Exploratory analysis
+```{r}
+require(ggplot2)
+
+table(training$classe)
+
+ggplot(training, aes(classe))+
+    geom_bar(aes(fill = classe), position = "dodge")
+
+
+```
+
+---
+
+###5.Building Decision tree as basic model 
+
+```{r}
+Model.0 = train(classe ~., method = "rpart", data = training)
+print(Model.0$finalModel)
+
+{plot(Model.0$finalModel, uniform = TRUE, main = "Classification Tree")
+text(Model.0$finalModel, use.n = TRUE, all = TRUE, cex = 1)}
+
+pred.0 = predict(Model.0, newdata = testing)
+table(pred.0)
+
+confusionMatrix(pred.0, testing$classe)$overall[1]
+````
+
+The result of the simple decision tree shows very low accuracy. Moreover, decision tree does not predict class "D"
+
+---
+
+###6.Biuld random forest
+
+```{r}
+Model1 = randomForest(classe ~ ., data = training)
+
+
+pred1 = predict(Model1, newdata = testing)
+
+table(pred1)
+
+confusionMatrix(pred1, testing$classe)$overall[1]
+
+```
+
+The result shows a very high accuracy
+
+---
+
+###7.Predict clasee with test data
+
+```{r}
+predClasse = predict(Model1, newdata = test)
+predClasse
+
+```
+
+```{r}
+answers <- as.vector(predClasse)
+
+pml_write_files = function(x) {
+    n = length(x)
+    for (i in 1:n) {
+        filename = paste0("prediction_", i, ".txt")
+        write.table(x[i], file = filename, quote = FALSE, row.names = FALSE, 
+            col.names = FALSE)
+    }
+}
+```
+pml_write_files(answers)

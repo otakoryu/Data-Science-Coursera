@@ -1,0 +1,325 @@
+---
+title: "Week4 Quiz"
+output: html_document
+---
+
+```{r setup, cache = F, echo = F, message = F, warning = F, tidy = F}
+# make this an external chunk that can be included in any file
+require(knitr)
+options(width = 100)
+opts_chunk$set(message = F, error = F, warning = F, comment = NA, fig.align = 'center', dpi = 100, tidy = F, cache=TRUE, cache.path = '.cache/', fig.path = 'fig/')
+options(xtable.type = 'html')
+knit_hooks$set(inline = function(x) {
+  if(is.numeric(x)) {
+    round(x, getOption('digits'))
+  } else {
+    paste(as.character(x), collapse = ', ')
+  }
+})
+knit_hooks$set(plot = knitr:::hook_plot_html)
+```
+
+###Q1
+For this quiz we will be using several R packages. R package versions change over time, the right answers have been checked using the following versions of the packages.
+
+AppliedPredictiveModeling: v1.1.6
+
+caret: v6.0.47
+
+ElemStatLearn: v2012.04-0
+
+pgmm: v1.1
+
+rpart: v4.1.8
+
+gbm: v2.1
+
+lubridate: v1.3.3
+
+forecast: v5.6
+
+e1071: v1.6.4
+
+If you aren't using these versions of the packages, your answers may not exactly match the right answer, but hopefully should be close.
+
+Load the vowel.train and vowel.test data sets:
+
+```{r}
+library(ElemStatLearn)
+
+data(vowel.train)
+
+data(vowel.test)
+```
+
+For this quiz we will be using several R packages. R package versions change over time, the right answers have been checked using the following versions of the packages.
+
+AppliedPredictiveModeling: v1.1.6
+
+caret: v6.0.47
+
+ElemStatLearn: v2012.04-0
+
+pgmm: v1.1
+
+rpart: v4.1.8
+
+gbm: v2.1
+
+lubridate: v1.3.3
+
+forecast: v5.6
+
+e1071: v1.6.4
+
+If you aren't using these versions of the packages, your answers may not exactly match the right answer, but hopefully should be close.
+
+Load the vowel.train and vowel.test data sets:
+
+
+Set the variable y to be a factor variable in both the training and test set. Then set the seed to 33833. Fit (1) a random forest predictor relating the factor variable y to the remaining variables and (2) a boosted predictor using the "gbm" method. Fit these both with the train() command in the caret package.
+
+What are the accuracies for the two approaches on the test data set? What is the accuracy among the test set samples where the two methods agree?
+
+```{r}
+require(AppliedPredictiveModeling); require(caret); require(ElemStatLearn); require(pgmm); require(rpart); require(gbm); require(lubridate); require(forecast); require(e0171)
+
+set.seed(33833)
+str(vowel.train)
+
+vowel.train$y <- as.factor(vowel.train$y); vowel.test$y <- as.factor(vowel.test$y)
+
+require(randomForest)
+ramFor = randomForest(y ~ ., data = vowel.train)
+
+preForest <- predict(ramFor, newdata = vowel.test)
+
+
+
+gbm = train(y ~ ., method = "gbm", data = vowel.train, verbose = FALSE)
+
+preGbm <- predict(gbm, newdata = vowel.test)
+
+
+require(ggplot2)
+qplot(preForest, preGbm, colour = y, data =  vowel.test)
+
+
+same = (preForest == preGbm)
+
+
+confusionMatrix(preForest, vowel.test$y)$overall[1]
+
+confusionMatrix(preGbm, vowel.test$y)$overall[1]
+
+confusionMatrix(vowel.test$y[same], preGbm[same])$overall[1]
+
+
+```
+
+---
+
+###Q2
+Load the Alzheimer's data using the following commands
+
+```{r}
+library(caret)
+
+library(gbm)
+
+set.seed(3433)
+
+library(AppliedPredictiveModeling)
+
+data(AlzheimerDisease)
+
+adData = data.frame(diagnosis,predictors)
+
+inTrain = createDataPartition(adData$diagnosis, p = 3/4)[[1]]
+
+training = adData[ inTrain,]
+
+testing = adData[-inTrain,]
+```
+
+Load the Alzheimer's data using the following commands
+
+
+Set the seed to 62433 and predict diagnosis with all the other variables using a random forest ("rf"), boosted trees ("gbm") and linear discriminant analysis ("lda") model. Stack the predictions together using random forests ("rf"). What is the resulting accuracy on the test set? Is it better or worse than each of the individual predictions?
+
+```{r}
+set.seed(62433)
+
+
+require(randomForest)
+
+ranFor <- randomForest(diagnosis ~ ., data = training)
+rForPred <- predict(ranFor, newdata = testing)
+
+gbm <- train(diagnosis ~ ., method = "gbm", data = training)
+gbmPred <- predict(gbm , newdata = testing)
+
+lda <- train(diagnosis ~ ., method = "lda", data = training)
+ldaPred <- predict(lda, newdata = testing)
+
+
+confusionMatrix(rForPred, testing$diagnosis)$overall[1]
+
+confusionMatrix(gbmPred, testing$diagnosis)$overall[1]
+
+confusionMatrix(ldaPred, testing$diagnosis)$overall[1]
+```
+
+#####_Stacking_
+
+```{r}
+
+predDF<- data.frame(rForPred, gbmPred, ldaPred, diagnosis = testing$diagnosis)
+
+combModFit <- randomForest(diagnosis ~ ., data = predDF)
+
+combPred<- predict(combModFit, predDF)
+
+confusionMatrix(combPred, testing$diagnosis)$overall[1]
+
+accuracy.table = cbind(confusionMatrix(rForPred, testing$diagnosis)$overall[1],
+confusionMatrix(gbmPred, testing$diagnosis)$overall[1],
+confusionMatrix(ldaPred, testing$diagnosis)$overall[1],
+confusionMatrix(combPred, testing$diagnosis)$overall[1])
+
+colnames(accuracy.table) <- c("RandomForest", "Bagging Boosting", "Lenear Discriminats", "Stacking with RandomForest")
+
+accuracy.table
+```
+
+####_Ans_
+Stacked Accuracy: 0.80 is better than random forests and lda and the same as boosting
+
+---
+
+###Q3
+Load the concrete data with the commands:
+
+```{r}
+set.seed(3523)
+
+library(AppliedPredictiveModeling)
+
+data(concrete)
+
+inTrain = createDataPartition(concrete$CompressiveStrength, p = 3/4)[[1]]
+
+training = concrete[ inTrain,]
+
+testing = concrete[-inTrain,]
+```
+
+Set the seed to 233 and fit a lasso model to predict Compressive Strength. Which variable is the last coefficient to be set to zero as the penalty increases? (Hint: it may be useful to look up ?plot.enet).
+
+```{r}
+set.seed(233)
+
+str(training)
+
+library(caret)
+
+lasso <- train(CompressiveStrength ~ ., method = "lasso", data = training)
+
+plot(lasso$finalModel, xvar = "penalty", use.color = TRUE)
+```
+
+####_Ans_
+As $lamba$ increases(penalizes a lot), all of coefficient starts be closer to zero, amongst them "_Cement_" is last varibales to reach to Zeoro
+
+---
+
+###Q4
+
+Load the data on the number of visitors to the instructors blog from here:
+
+https://d396qusza40orc.cloudfront.net/predmachlearn/gaData.csv
+
+Using the commands:
+
+```{r}
+library(lubridate) # For year() function below
+
+dat = read.csv("gaData.csv")
+
+training = dat[year(dat$date) < 2012,]
+
+testing = dat[(year(dat$date)) > 2011,]
+
+tstrain = ts(training$visitsTumblr)
+```
+
+Fit a model using the bats() function in the forecast package to the training time series. Then forecast this model for the remaining time points. For how many of the testing points is the true value within the 95% prediction interval bounds?
+
+```{r}
+require(forecast)
+
+bats =  bats(tstrain)
+
+foc = predict(bats, nrow(testing))
+plot(foc)$mean
+
+upper = foc[["upper"]][,2]
+lower = foc[["lower"]][,2]
+
+table ( 
+  (testing$visitsTumblr>lower) & 
+  (testing$visitsTumblr<upper))
+
+
+
+226/nrow(testing)
+
+```
+
+####_Ans_
+96%
+
+---
+
+###Q5
+Load the concrete data with the commands:
+
+```{r}
+set.seed(3523)
+
+library(AppliedPredictiveModeling)
+
+require(caret)
+
+data(concrete)
+
+inTrain = createDataPartition(concrete$CompressiveStrength, p = 3/4)[[1]]
+
+training = concrete[ inTrain,]
+
+testin = concrete[-inTrain,]
+```
+
+Set the seed to 325 and fit a support vector machine using the e1071 package to predict Compressive Strength using the default settings. Predict on the testing set. What is the RMSE?
+
+```{r}
+set.seed(325)
+
+require(e1071)
+
+require(forecast)
+
+svm = svm(CompressiveStrength ~ ., data = training)
+
+predSVM = predict(svm, newdata = testin)
+
+error = predSVM - testin$CompressiveStrength
+
+sqrt(mean(error^2))
+```
+
+```{r}
+require(ggplot2)
+
+qplot(predSVM, testin$CompressiveStrength, colour = testin$Age, data = testin)
+```
