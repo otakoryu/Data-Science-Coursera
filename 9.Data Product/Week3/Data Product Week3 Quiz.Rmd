@@ -1,0 +1,52 @@
+---
+title: "Data Product Week3 Quiz"
+author: "Ryu Uezato"
+date: "May 9, 2019"
+output: html_document
+---
+
+###Q1
+Which of the following items is required for an R package to pass R CMD check without any warnings or errors?
+
+_Ans_
+ 
+  - *DESCRIPTION file*
+  
+---
+
+###Q2
+2. Question 2
+Which of the following is a generic function in a fresh installation of R, with only the default packages loaded? (Select all that apply)
+
+_Ans_
+
+  - *mean*
+  - *show*
+  - *predict*
+
+---
+
+###Q3
+What function is used to obtain the function body for an S4 method function?
+
+_Ans_
+
+  - *getMethod()*
+  
+---
+
+###Q4
+
+Please download the R package DDPQuiz3 from the course web site. Examine the \verb|createmean|createmean function implemented in the R/ sub-directory. What is the appropriate text to place above the \verb|createmean|createmean function for Roxygen2 to create a complete help file?
+
+```
+#' This function calculates the mean
+#'
+#' @param x is a numeric vector
+#' @return the mean of x
+#' @export
+#' @examples
+#' x <- 1:10
+#' createmean(x)
+```
+

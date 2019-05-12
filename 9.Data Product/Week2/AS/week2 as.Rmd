@@ -1,0 +1,48 @@
+---
+title: "My Map"
+author: "Ryu Uezato"
+date: "May 8, 2019"
+output: html_document
+---
+
+```{r setup, cache = F, echo = F, message = F, warning = F, tidy = F}
+# make this an external chunk that can be included in any file
+require(knitr)
+options(width = 100)
+opts_chunk$set(message = F, error = F, warning = F, comment = NA, fig.align = 'center', dpi = 100, tidy = F, cache=TRUE, cache.path = '.cache/', fig.path = 'fig/')
+options(xtable.type = 'html')
+knit_hooks$set(inline = function(x) {
+  if(is.numeric(x)) {
+    round(x, getOption('digits'))
+  } else {
+    paste(as.character(x), collapse = ', ')
+  }
+})
+knit_hooks$set(plot = knitr:::hook_plot_html)
+```
+
+
+###Peer-graded Assignment: R Markdown and Leaflet
+
+&nbsp
+
+Create a web page using R Markdown that features a map created with Leaflet.
+
+Host your webpage on either GitHub Pages, RPubs, or NeoCities.
+
+Your webpage must contain the date that you created the document, and it must contain a map created with Leaflet. We would love to see you show off your creativity!
+
+----
+
+```{r}
+library(leaflet)
+
+my_map <- leaflet() %>% 
+  addTiles()
+
+my_map <- my_map %>%
+  addMarkers(lat=3.0649, lng= 101.6009, 
+             popup="Monash University Malaysia")
+my_map
+
+```

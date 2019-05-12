@@ -1,0 +1,72 @@
+---
+title: "Week2 Quiz"
+output: html_document
+---
+
+###Q1
+
+What is rmarkdoown?
+
+_Ans_
+  
+  - *A format can be interprested into mardown(which is a simplified markup language).*
+  
+  - *A simplified format that, when interpreted, incorporates your R analysis into your document.*
+  
+---
+
+###Q2
+
+In rmarkdown presentations, in the options for code chunks, what command prevents the code from being repeated before results in the final interpreted ducument?
+
+_Ans_
+
+  - *echo = FALSE*
+  
+---
+
+###Q3
+
+In rmarkdown presentations, in the options for code chunks, what prevent the code from being interpreted?
+
+_Ans_
+
+  - *eval = FALSE*
+  
+---
+
+###Q4
+
+What is leaflet?
+
+_Ans_
+
+   - *A javascript library for creating interactive maps.*
+   - *An R package interface to the javascript library of the same name.*
+  
+---
+
+###Q5
+
+The R command
+```
+df %>% leaflet() %>% addTiles()
+```
+
+is equivalent to what?
+
+_Ans_
+  
+  - *leaflet(df) %>% addTiles()*
+  - *addTiles(leaflet(df))*
+  
+---
+
+###Q6
+
+If I want to add popup icons to my leaflet map in R, I should use.
+
+_Ans_ 
+
+  - *addMarkers*
+  

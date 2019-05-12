@@ -1,0 +1,42 @@
+---
+title: "Data Products  week3 assignment"
+author: "Ryu Uezato"
+date: "May 11, 2019"
+output: ioslides_presentation
+---
+
+##Markdwon Presentation & Plotly
+
+Create a web page presentation using R Markdown that features a plot created with Plotly. Host your webpage on either GitHub Pages, RPubs, or NeoCities. Your webpage must contain the date that you created the document, and it must contain a plot created with Plotly. We would love to see you show off your creativity!
+
+##Mtcars data correlation
+```{r, echo=FALSE}
+library(datasets)
+data("mtcars")
+
+res = cor(mtcars)
+round(res,2)
+```
+
+##3D graphics
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+require(plotly)
+data = as.data.frame(cbind(mtcars$mpg, mtcars$cyl, mtcars$wt))
+colnames(data) = c("mpg", "cly", "wt") ; data$cly = as.factor(data$cly)
+p <- plot_ly(data, x = ~wt, y = ~cly, z = ~mpg, color = ~cly, colors = c('#BF382A', '#0C4B8E')) %>%
+  add_markers() %>%
+  layout(scene = list(xaxis = list(title = 'Weight'),
+                     yaxis = list(title = 'the number of clynder'),
+                     zaxis = list(title = 'Miles per Galaon')))
+p
+```
+
+
+##Regression Model
+```{r, echo=FALSE}
+fit = lm(mpg ~ cly + wt, data = data)
+
+fit
+```
+
+Based on the regression on weight and the number of clynder, as the more number of cylinder a car has,  the lower fuel consumption a car has. Futhermore, as a cars's weight is higher, a car's ability to run distance will be lesser and lesser.
